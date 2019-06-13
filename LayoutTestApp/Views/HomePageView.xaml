@@ -3,73 +3,111 @@
              xmlns="http://xamarin.com/schemas/2014/forms" 
              x:Class="LayoutTestApp.Views.HomePageView" 
              xmlns:viewModels="clr-namespace:LayoutTestApp.ViewModels" 
+             xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
              xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
              ios:Page.UseSafeArea="true"
+             BackgroundColor="MediumTurquoise"
              Visual="Material">
     <ContentPage.BindingContext>
         <viewModels:HomePageViewModel x:Key="ViewModel" />
     </ContentPage.BindingContext>
-    <ContentPage.Resources>
-        <Style TargetType="Grid">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor"
-                                        Value="White" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
-        </Style>
-    </ContentPage.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*" />
-            <ColumnDefinition Width="50*" />
-        </Grid.ColumnDefinitions>
-        <CollectionView Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        ItemsSource="{Binding CollectionItems}"
-                        SelectionMode="Single"
-                        SelectedItem="{Binding SelectedPoster, Mode=TwoWay}">
-            <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Horizontal"
-                                 SnapPointsAlignment="Center" 
-                                 SnapPointsType="Mandatory"/>
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Frame Grid.Row="1"
-                               Margin="30,30,30,30">
-                            <Image Source="{Binding Name}"
-                                   Aspect="AspectFill"/>
-                        </Frame>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-<!--        <Button Text="refresh"
+    <ScrollView>
+        <ContentPage.Resources>
+            <Style TargetType="Grid">
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Selected">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor"
+                                            Value="MediumTurquoise" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+        </ContentPage.Resources>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="500" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+            <CollectionView Grid.Row="0"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,0,0,0"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            ItemsSource="{Binding CollectionItems, Mode=TwoWay}"
+                            SelectedItem="{Binding SelectedPoster, Mode=TwoWay}"
+                            SelectionMode="Single">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Horizontal"
+                                     SnapPointsAlignment="Center" 
+                                     SnapPointsType="Mandatory"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <yummy:PancakeView CornerRadius="20,20,20,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>    
+                                <yummy:PancakeView CornerRadius="60,60,60,60" 
+                                                   IsClippedToBounds="true"
+                                                   Grid.Row="0">
+                                    <Image Source="{Binding PosterLink}"
+                                           Aspect="AspectFit"/>
+                                </yummy:PancakeView>
+                                <Label Text="{Binding Name}"
+                                       Grid.Row="0"
+                                       VerticalTextAlignment="Start"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="White"
+                                       FontSize="Medium"
+                                       FontAttributes="Bold"/>
+                                <yummy:PancakeView Grid.Row="1"
+                                                   Margin="20,0,20,0"
+                                                   WidthRequest="-10">
+                                    <Label Text="{Binding Description}"/>
+                                </yummy:PancakeView>
+                            </Grid>
+                        </yummy:PancakeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <StackLayout>
+                        <Label Text="No results matched your filter."
+                               Margin="10,25,10,10"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               HorizontalOptions="Fill"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Try a broader filter?"
+                               FontAttributes="Italic"
+                               FontSize="12"
+                               HorizontalOptions="Fill"
+                               HorizontalTextAlignment="Center" />
+                    </StackLayout>
+                </CollectionView.EmptyView>
+            </CollectionView>
+            <Button Text="refresh"
                 Grid.Row="3"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
-                Command="{Binding RefreshCmdBtn}"/>-->
-    </Grid>
+                Margin="20"
+                Command="{Binding RefreshCmdBtn}"/>
+        </Grid>
+    </ScrollView>
 </ContentPage>

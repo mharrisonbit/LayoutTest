@@ -1,28 +1,38 @@
 using MvvmHelpers;
 using System.Collections.ObjectModel;
 using LayoutTestApp.Models;
-using System.Windows.Input;
 using Xamarin.Forms;
 using System;
+using LayoutTestApp.Helpers;
+using System.Threading.Tasks;
 
 namespace LayoutTestApp.ViewModels
 {
     public class HomePageViewModel : BaseViewModel
     {
+
         public HomePageViewModel()
         {
-            PopulatePosters();
+            CollectionItems = new ObservableCollection<Movie>();
+            PopulatePostersAsync();
         }
 
-        ObservableCollection<MoviePoster> _CollectionItems;
-        public ObservableCollection<MoviePoster> CollectionItems
+        ObservableCollection<Movie> _CollectionItems;
+        public ObservableCollection<Movie> CollectionItems
         {
             get { return _CollectionItems; }
             set { SetProperty(ref _CollectionItems, value); }
         }
 
-        MoviePoster _SelectedPoster;
-        public MoviePoster SelectedPoster
+        //ObservableCollection<Movie> _CollectionItems;
+        //public ObservableCollection<Movie> CollectionItems
+        //{
+        //    get { return _CollectionItems; }
+        //    set { SetProperty(ref _CollectionItems, value); }
+        //}
+
+        Movie _SelectedPoster;
+        public Movie SelectedPoster
         {
             get { return _SelectedPoster; }
             set 
@@ -34,24 +44,51 @@ namespace LayoutTestApp.ViewModels
             }
         }
 
-        private void PopulatePosters()
+        Uri _TestImage;
+        public Uri TestImage
         {
-            var listOfItems = new ObservableCollection<MoviePoster>();
-            for (int i = 0; i < 10; i++)
+            get { return _TestImage; }
+            set { SetProperty(ref _TestImage, value); }
+        }
+
+        private async Task PopulatePostersAsync()
+        {
+            var address = Constants.ApiUrl + Constants.Movies;
+            //CollectionItems = new ObservableCollection<Movie>();
+            var listOfItems = new ObservableCollection<Movie>();
+
+            var answer = await new ApiCalls().GetDataFromServer(address, "GET");
+            try
             {
-                listOfItems.Add(new MoviePoster
+                var i =  0;
+                foreach (var item in answer["data"])
                 {
-                    Name = "Runner.jpg",
-                    Id = i
-                });
+                    Uri posterUri = new Uri(Constants.ApiUrl + item["field_movie_poster"]);
+                    Uri websiteUrl = new Uri(item["field_movie_website_url"].ToString());
+
+                    listOfItems.Add(new Movie
+                    {
+                        Name = item["title"].ToString(),
+                        Id = i + 1,
+                        PosterLink = posterUri,
+                        Description = item["field_movie_description"].ToString(),
+                        Rating = item["field_movie_rating"].ToString(),
+                        Uri = websiteUrl
+                    });
+                }
+                //CollectionItems = listOfItems;
             }
-            _CollectionItems = listOfItems;
+            catch (Exception ex)
+            {
+                CollectionItems = null;
+                Console.WriteLine("ERROR!!!                   HomePageViewModel:PopulatePostersAsync " + ex.Message);
+            }
         }
 
 
         public Command RefreshCmdBtn => new Command(() =>
         {
-            PopulatePosters();
+            PopulatePostersAsync();
         });
     }
 }
